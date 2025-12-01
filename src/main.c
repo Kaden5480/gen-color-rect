@@ -1,8 +1,8 @@
 #include <math.h>
 #include <stdio.h>
 
-#define WIDTH  800
-#define HEIGHT 600
+#define WIDTH  200
+#define HEIGHT 150
 #define HUE    0
 #define OUTPUT "output.ppm"
 

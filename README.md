@@ -8,7 +8,11 @@ format.
 You can then convert the image to another format afterwards using a tool like
 [ImageMagick](https://imagemagick.org/).
 
-![Example](assets/example.png)
+<p align="center">
+    <img src="assets/1.png" style="width: 25%">
+    <img src="assets/2.png" style="width: 25%">
+    <img src="assets/3.png" style="width: 25%">
+</p>
 
 # Building
 ```sh

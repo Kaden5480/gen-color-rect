@@ -15,6 +15,7 @@ typedef enum ImageFormat {
 typedef struct Args {
     int width;
     int height;
+    int hue;
     ImageFormat format;
     char *output;
 } Args;

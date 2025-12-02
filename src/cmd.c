@@ -11,16 +11,18 @@ void Args_show_usage(int argc, char **argv) {
         "  -h --help        Display the usage\n"
         "  -p --ppm         Use PPM for the output (default)\n"
         "  -P --pam         Use PAM for the output\n"
-        "  -w --width <n>   The width of the generated image\n"
-        "  -h --height <n>  The height of the generated image\n",
+        "  -w --width <n>   The width of the generated image (default: 128)\n"
+        "  -H --height <n>  The height of the generated image (default: 128)\n"
+        "  --hue <n>        The hue to use (0-360, default: 0)\n",
         argv[0], VERSION, argv[0]
     );
 }
 
 Args Args_from(int argc, char **argv) {
     Args args = {
-        .width = 0,
-        .height = 0,
+        .width = 128,
+        .height = 128,
+        .hue = 0,
         .format = ImageFormat_PPM,
         .output = NULL
     };
@@ -67,6 +69,15 @@ Args Args_from(int argc, char **argv) {
 
             i++;
             args.height = atoi(argv[i]);
+        }
+        else if (strcmp("--hue", arg) == 0) {
+            if (i + 1 >= argc) {
+                Args_show_usage(argc, argv);
+                exit(1);
+            }
+
+            i++;
+            args.hue = atoi(argv[i]);
         }
         else if (args.output == NULL) {
             args.output = arg;

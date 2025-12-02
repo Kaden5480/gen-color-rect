@@ -1,8 +1,10 @@
 # gen-color-rect
 
-A simple C program which generates a color rectangle of any
-hue and size (configured through macros) and outputs it in a
+A C program which generates a color rectangle of any
+hue (configured through a macro) and size and outputs it in a
 [PPM](https://en.wikipedia.org/wiki/Netpbm#PPM_example)
+or
+[PAM](https://en.wikipedia.org/wiki/Netpbm#PAM_graphics_format)
 format.
 
 You can then convert the image to another format afterwards using a tool like

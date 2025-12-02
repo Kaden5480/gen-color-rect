@@ -4,8 +4,6 @@
 #include "lib/convert.h"
 #include "lib/formats.h"
 
-#define HUE 110
-
 void write_output(Args args, FILE *fp, int (*writer)(FILE*, Color)) {
     double width = args.width;
     double height = args.height;
@@ -17,9 +15,9 @@ void write_output(Args args, FILE *fp, int (*writer)(FILE*, Color)) {
         args.width, args.height
     );
 
-    for (double y = 0; y < height; y++) {
+    for (double y = height; y >= 0; y--) {
         for (double x = 0; x < width; x++) {
-            Color color = Color_hsv(HUE, x/width, 1-(y/height));
+            Color color = Color_hsv(args.hue, x/width, y/height);
             writer(fp, color);
         }
     }

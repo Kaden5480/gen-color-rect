@@ -3,7 +3,10 @@ CFLAGS ?= -march=native -O2 -pipe
 
 CFLAGS := $(CFLAGS) -Wall -Wextra -Werror
 
-OBJS := src/main.o
+OBJS := src/main.o \
+		src/cmd.o \
+		src/lib/convert.o \
+		src/lib/formats.o
 
 .PHONY: build clean
 

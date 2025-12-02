@@ -1,70 +1,73 @@
-#include <math.h>
-#include <stdio.h>
+#include <assert.h>
 
-#define WIDTH  200
-#define HEIGHT 150
-#define HUE    0
-#define OUTPUT "output.ppm"
+#include "cmd.h"
+#include "lib/convert.h"
+#include "lib/formats.h"
 
-/**
- * See:
- * https://en.wikipedia.org/wiki/HSL_and_HSV#Color_conversion_formulae
- */
-float hslf(float h, float s, float l, int n) {
-    float a = s * fminf(l, 1.0-l);
-    float k = fmodf((n + h/30.0), 12.0);
+#define HUE 110
 
-    float value = 255.0 * (l - a * fmaxf(-1.0,
-        fminf(fminf(k-3.0, 9.0-k), 1.0)
-    ));
+void write_output(Args args, FILE *fp, int (*writer)(FILE*, Color)) {
+    double width = args.width;
+    double height = args.height;
 
-    return value;
-}
+    printf(
+        "Writing image:\n"
+        "- width:  %d\n"
+        "- height: %d\n",
+        args.width, args.height
+    );
 
-/**
- * Writes an HSL value as RGB to a file in PPM format.
- */
-int write_hsl(FILE *fp, float h, float s, float l) {
-    int r = hslf(h, s, l, 0);
-    int g = hslf(h, s, l, 8);
-    int b = hslf(h, s, l, 4);
-
-    if (fprintf(fp, "%d %d %d\n", r, g, b) < 0) {
-        perror("Failed writing RGB");
-        return 1;
-    }
-
-    return 0;
-}
-
-/**
- * Writes the PPM header to a file pointer `fp`.
- */
-void write_header(FILE *fp) {
-    if (fprintf(fp,
-        "P3\n"
-        "%d %d\n"
-        "255\n",
-        WIDTH, HEIGHT
-    ) < 0) {
-        perror("Failed writing header");
-    }
-}
-
-int main(void) {
-    FILE *fp = fopen(OUTPUT, "w");
-    if (fp == NULL) {
-        fprintf(stderr, "Failed opening '%s'\n", OUTPUT);
-        return 1;
-    }
-
-    write_header(fp);
-
-    for (float y = 0; y < HEIGHT; y += 1) {
-        for (float x = 0; x < WIDTH; x += 1) {
-            write_hsl(fp, HUE, x/WIDTH, 1-(y/HEIGHT));
+    for (double y = 0; y < height; y++) {
+        for (double x = 0; x < width; x++) {
+            Color color = Color_hsv(HUE, x/width, 1-(y/height));
+            writer(fp, color);
         }
     }
 
-    fclose(fp);
+    printf("Wrote output to: %s\n", args.output);
+}
+
+int main(int argc, char *argv[]) {
+    Args args = {0};
+    FILE *fp = NULL;
+    int (*writer)(FILE*, Color) = NULL;
+
+    if (argc < 1) {
+        return 1;
+    }
+
+    args = Args_from(argc, argv);
+
+    fp = fopen(args.output, "w");
+    if (fp == NULL) {
+        perror("Failed opening output for writing");
+        return 1;
+    }
+
+    switch (args.format) {
+        case ImageFormat_PPM:
+            if (ppm_write_header(fp, args.width, args.height) != 0) {
+                perror("Failed writing PPM header");
+                return 1;
+            }
+            writer = ppm_write_color;
+            break;
+        case ImageFormat_PAM:
+            if (pam_write_header(fp, args.width, args.height) != 0) {
+                perror("Failed writing PAM header");
+                return 1;
+            }
+            writer = pam_write_color;
+            break;
+        default:
+            fprintf(stderr,
+                "Unexpected image format: %d\n",
+                args.format
+            );
+            return 1;
+    }
+
+    assert(writer != NULL);
+
+    write_output(args, fp, writer);
 }
